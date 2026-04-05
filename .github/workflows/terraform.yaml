@@ -4,15 +4,15 @@ on:
     branches:
       - stage
       - main
-    # paths:
-    #   - "*.tf"
-    #   - "*.tfvars"
+    paths:
+      - "*.tf"
+      - "*.tfvars"
   pull_request:
     branches:
       - main
-    # paths:
-    #   - "*.tf"
-    #   - "*.tfvars"
+    paths:
+      - "*.tf"
+      - "*.tfvars"
   workflow_dispatch:
 env:
   AWS_REGION: us-east-1
