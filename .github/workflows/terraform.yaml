@@ -71,6 +71,7 @@ jobs:
         id: getconfig
         if: steps.apply.outcome == 'success'
         run: aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.CLUSTER_NAME }}
+        # aws eks update-kubeconfig --region us-east-1 --name vprofile-cluster
 
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
