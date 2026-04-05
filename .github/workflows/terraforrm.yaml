@@ -1,0 +1,59 @@
+name: Terraform CI/CD
+on:
+  workflow_dispatch:
+jobs:
+  terraform:
+    name: Apply Terraform code changes
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
+        shell: bash
+    steps:
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: "1.14.6"
+
+      - name: Clone source code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials for Dev
+        uses: aws-actions/configure-aws-credentials@v6.1.0
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Terraform Init
+        id: init
+        run: terraform init -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}"
+
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -input=false -out planfile
+
+      - name: Check terraform plan status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      - name: Terraform Apply
+        id: apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
+        run: terraform apply -auto-approve -input=false -parallelism=1 planfile
+
+      - name: Get Kube Config file
+        id: getconfig
+        run: aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.CLUSTER_NAME }}
+
+      - name: Install Nginx Ingress Controller
+        id: installingress
+        run: kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.1.3/deploy/static/provider/aws/deploy.yaml
