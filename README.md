@@ -1,6 +1,6 @@
 # GitOps — Infrastructure & Application Delivery on AWS EKS
-Infrastructure Repo: https://github.com/vanluong2003/infra-eks-vpc
-Application Repo: https://github.com/vanluong2003/vprofile-app
+- Infrastructure Repo: https://github.com/vanluong2003/infra-eks-vpc
+- Application Repo: https://github.com/vanluong2003/vprofile-app
 
 Production-grade GitOps pipeline automating infrastructure provisioning, container image lifecycle, and Kubernetes deployments — all driven by Git.
 
